@@ -14,8 +14,7 @@ i18n.add('es', es)
 
 <template>
   <img alt="Vue logo" src="./assets/logo.png" />
-  <HelloWorld msg="Hello Vue 3 + TypeScript + Vite" :i18n="i18n" />
-  {{ i18n.msg.test }}
+  <HelloWorld :msg="i18n.msg.title" :i18n="i18n" />
 </template>
 
 <style>
