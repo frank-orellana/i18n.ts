@@ -1,5 +1,5 @@
 {
-  "name": "i18n.ts",
+  "name": "simple-i18n-ts",
   "version": "0.0.1-beta",
   "description": "Simple internationalization library to use in typescript or javascript projects. Provides automated validation.",
   "main": "dist/i18n.js",
