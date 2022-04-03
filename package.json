@@ -4,6 +4,7 @@
   "description": "Simple internationalization library to use in typescript or javascript projects. Provides automated validation.",
   "main": "dist/i18n.js",
   "types": "dist/i18n.d.ts",
+  "type": "module",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "build": "tsc",
