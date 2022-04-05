@@ -6,12 +6,16 @@
   "types": "dist/i18n.d.ts",
   "type": "module",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
+    "test": "vitest",
+    "coverage": "vitest run --coverage",
     "build": "tsc",
     "format": "prettier --write \"src/**/*.ts\" \"src/**/*.js\"",
     "lint": "eslint",
     "prepare": "pnpm build",
-    "preversion": "pnpm lint"
+    "preversion": "pnpm lint",
+    "sonar": "pnpm coverage && npx sonar-scanner -Dsonar.login=$SONAR",
+    "sonar:win": "pnpm coverage && npx sonar-scanner -Dsonar.login=%SONAR%"
+
   },
   "author": "Frank Orellana <franklin99@gmail.com>",
   "repository": {
@@ -20,8 +24,10 @@
   },
   "license": "MIT",
   "devDependencies": {
+    "c8": "^7.11.0",
     "eslint": "^8.12.0",
     "prettier": "^2.6.2",
+    "sonar-scanner": "^3.1.0",
     "typescript": "^4.6.3",
     "vitest": "^0.8.4"
   },
