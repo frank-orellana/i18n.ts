@@ -9,12 +9,12 @@
     "test": "vitest",
     "coverage": "vitest run --coverage",
     "build": "tsc",
-    "format": "prettier --write \"src/**/*.ts\" \"src/**/*.js\"",
+    "format": "prettier --write \"src/**/*.{ts,tsx,js,jsx}\" ",
     "lint": "eslint",
     "prepare": "pnpm build",
     "preversion": "pnpm lint",
-    "sonar": "pnpm coverage && npx sonar-scanner -Dsonar.login=$SONAR",
-    "sonar:win": "pnpm coverage && npx sonar-scanner -Dsonar.login=%SONAR%"
+    "sonar": "pnpm coverage && npx sonar-scanner -Dsonar.login=$SONAR_LOGIN",
+    "sonar:win": "pnpm coverage && npx sonar-scanner -Dsonar.login=%SONAR_LOGIN%"
 
   },
   "author": "Frank Orellana <franklin99@gmail.com>",

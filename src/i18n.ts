@@ -1,4 +1,4 @@
-import { matchLang } from "./tools";
+import { matchLang } from "./tools.js";
 
 export class Language<M> {
   messages: M;

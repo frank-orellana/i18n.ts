@@ -5,10 +5,12 @@
   "scripts": {
     "dev": "vite",
     "build": "vue-tsc --noEmit && vite build",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "test": "vitest"
   },
   "dependencies": {
     "simple-i18n-ts": "link:..\\..",
+    "vitest": "^0.9.3",
     "vue": "^3.2.25"
   },
   "devDependencies": {
