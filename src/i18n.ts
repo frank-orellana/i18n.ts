@@ -1,80 +1,101 @@
 import { matchLang } from "./tools";
 
+export class Language<M> {
+  messages: M;
+  fallbackLang: Language<M> | null | undefined;
+
+  constructor(messages: M, fallbackLang?: Language<M> | null) {
+    this.fallbackLang = fallbackLang;
+    this.messages = messages;
+  }
+
+  applyPartial(partialMsgs: Partial<M>) {
+    const baseLang = this.fallbackLang
+      ? this.fallbackLang.applyPartial(this.messages)
+      : {};
+    const newMsgs: M = Object.assign<any, M>(baseLang, this.messages);
+    Object.assign(newMsgs, partialMsgs);
+    return newMsgs;
+  }
+}
 export interface Messages {
-	[x: string]: any
+  [x: string]: any;
+}
+
+export interface AddOptions {
+  fallback: string;
 }
 export class I18N<M extends Messages> {
-	static readonly defaultLangName = 'en';
-	langs = new Map<string, M>();
+  static readonly defaultLangName = "en";
+  langs = new Map<string, Language<M>>();
 
-	readonly msg: M;
-	_currentLang: string = I18N.defaultLangName;
-	_realCurrentLang: string = I18N.defaultLangName
+  readonly msg: M;
+  _defaultLangName: string = I18N.defaultLangName;
+  _currentLang: string = I18N.defaultLangName;
+  _realCurrentLang: string = I18N.defaultLangName;
 
-	constructor(defaultMsgs: M, langName: string = I18N.defaultLangName) {
-		this.selectLang();
-		this.langs.set(langName, defaultMsgs)
-		this.msg = Object.assign({}, defaultMsgs)
-	}
+  constructor(defaultMsgs: M, langName: string = I18N.defaultLangName) {
+    this.langs.set(langName, new Language(defaultMsgs, null));
+    if (langName) this._defaultLangName = langName;
+    this.msg = Object.assign({}, defaultMsgs);
 
-	get defaultLang() {
-		return this.langs.get(I18N.defaultLangName) as M
-	}
+    this.selectLang();
+  }
 
-	get currentLang() {
-		return this._currentLang
-	}
+  get defaultLangName() {
+    return this._defaultLangName;
+  }
 
-	set currentLang(newLang: string) {
-		this.selectLang(newLang)
-	}
+  get defaultLang() {
+    return this.langs.get(this.defaultLangName) as Language<M>;
+  }
 
-	get realCurrentLang() {
-		return this._realCurrentLang
-	}
+  get currentLang() {
+    return this._currentLang;
+  }
 
-	selectLang(newLang?: string) {
-		let lang: string = newLang ?? (typeof window !== 'undefined' ? window.navigator.languages[0] : I18N.defaultLangName)
-		const matchedLang = matchLang(lang, this.langs, I18N.defaultLangName)
+  set currentLang(newLang: string) {
+    this.selectLang(newLang);
+  }
 
-		this._realCurrentLang = matchedLang
-		const m = this.langs.get(matchedLang)
-		if (m) Object.assign(this.msg, m)
+  get realCurrentLang() {
+    return this._realCurrentLang;
+  }
 
-		this._currentLang = lang;
-	}
+  selectLang(newLang?: string) {
+    let lang: string =
+      newLang ??
+      (typeof window !== "undefined"
+        ? window.navigator.languages[0]
+        : this.defaultLangName);
+    const matchedLang = matchLang(lang, this.langs, this.defaultLangName);
 
-	add(langName: string, obj: M) {
-		const langObj = this.langs.get(langName);
-		if (!langObj) {
-			this.langs.set(langName, obj);
-		} else {
-			Object.assign(langObj, obj)
-		}
-	}
+    this._realCurrentLang = matchedLang;
+    const m = this.langs.get(matchedLang);
+    if (m) Object.assign<M, Partial<M>>(this.msg, m.messages);
 
-	addPartial(lang: string, obj: Partial<M>, fallbackLang?: string) {
-		const langObj = (fallbackLang ? this.langs.get(fallbackLang) : null) ?? this.langs.get(lang);
-		if (!langObj) {
-			this.langs.set(lang, Object.assign(this.defaultLang, obj));
-		} else {
-			Object.assign(langObj, obj)
-		}
-	}
+    this._currentLang = lang;
+  }
 
-	getMessage(messageId: keyof M): string | undefined {
-		if (!this.msg) return;
-		let res = this.msg[messageId];
+  add(langName: string, messages: M) {
+    this.langs.set(langName, new Language<M>(messages, null));
+  }
 
-		if (!res) {
-			let errMsg: string = `I18N: message "${messageId}" not found in language ${this.currentLang}`;
-			if (this.currentLang != I18N.defaultLangName) {
-				res = this.defaultLang[messageId];
-				errMsg += res ? `, using default lang` : ` nor in default lang`;
-				console.warn(errMsg);
-			}
-		}
+  addPartial(
+    langName: string,
+    messages: Partial<M>,
+    fallbackLangName: string = this.defaultLangName
+  ) {
+    const fallbackLang = this.langs.get(fallbackLangName);
 
-		return res;
-	}
+    if (fallbackLang) {
+      const newMsgs = fallbackLang.applyPartial(messages);
+      this.langs.set(langName, new Language<M>(newMsgs, fallbackLang));
+    }
+  }
+
+  getMessage(messageId: keyof M): string | undefined {
+    if (!this.msg || !this.defaultLang) return;
+    return this.msg[messageId];
+  }
 }
